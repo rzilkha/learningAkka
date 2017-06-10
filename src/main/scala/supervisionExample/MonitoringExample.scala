@@ -4,11 +4,19 @@ import akka.actor.{Actor, ActorRef, ActorSystem, Props, Terminated}
 
 class Ares(actorWatch:ActorRef) extends Actor{
   override def preStart(): Unit = {
-    super.preStart()
+    context.watch(actorWatch)
+//    super.preStart()
+  }
+
+  override def postStop() = {
+    println("Ares postStop...")
   }
 
   override def receive = {
-    case Terminated => println("athena terminated")
+    case Terminated(_) => {
+      println("ares received Stop from athena termination")
+      context.stop(self)
+    }
   }
 }
 class Athena extends Actor{
@@ -24,9 +32,14 @@ class Athena extends Actor{
   * Created by Roee Zilkha on 6/10/2017.
   */
 object MonitoringExample extends App {
-    val system = ActorSystem("monitoring")
-  val athenaActor = system.actorOf(Props[Athena],"athena")
-  val aresActor= system.actorOf(Props(new Ares(athenaActor)),"ares")
+  // Create the 'monitoring' actor system
+  val system = ActorSystem("monitoring")
 
-  athenaActor ! "yo man"
+  val athena = system.actorOf(Props[Athena], "athena")
+
+  val ares = system.actorOf(Props(classOf[Ares], athena), "ares")
+
+  athena ! "Hi"
+
+  Thread.sleep(500)
 }
