@@ -13,7 +13,7 @@ class Ares(actorWatch:ActorRef) extends Actor{
 }
 class Athena extends Actor{
 
-  override def receive()={
+   override def receive()={
     case msg =>{
       println(s"stopping athena $msg")
       context.stop(self)
