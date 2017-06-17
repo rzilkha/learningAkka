@@ -3,14 +3,14 @@ package persistence
 import akka.actor.{ActorSystem, Props}
 import akka.persistence.{PersistentActor, SnapshotOffer}
 import akka.persistence.serialization.Snapshot
-import persistence.Counter.{Cmd, Decrement, Evnt, Increment}
+import persistence.Counter.{Cmd, Decrement2, Evnt, Increment2}
 
 case class State(var count:Int);
 
 object Counter{
   sealed trait Operation;
-  case object Increment extends Operation;
-  case object Decrement extends Operation;
+  case object Increment2 extends Operation;
+  case object Decrement2 extends Operation;
 
   case class Cmd(op:Operation)
   case class Evnt(op:Operation)
@@ -43,10 +43,10 @@ class countActor extends PersistentActor{
 
   def updateState(evnt:Evnt): Unit ={
     evnt match {
-      case Evnt(Increment) =>
+      case Evnt(Increment2) =>
         println("increment")
         state.count = state.count + 1
-      case Evnt(Decrement) =>
+      case Evnt(Decrement2) =>
         state.count = state.count - 1;
     }
     println(s"count is $state")
@@ -68,5 +68,5 @@ object PersistenceActorExample extends App{
   val system = ActorSystem("system")
   val persist = system.actorOf(Props[countActor])
   println("dasda")
-  persist ! Cmd(Increment)
+  persist ! Cmd(Increment2)
 }
